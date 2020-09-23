@@ -23,18 +23,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        
-        // Set the scene to the view
-        sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Create a session configuration
-        let configuration = ARWorldTrackingConfiguration()
+        let configuration = ARImageTrackingConfiguration()
+        if let imageToTrack = ARReferenceImage.referenceImages(inGroupNamed: "KemSU AR Resources", bundle: .main) {
+            configuration.trackingImages = imageToTrack
+            configuration.maximumNumberOfTrackedImages = 1
+            print("Image successfully added!")
+        }
+        
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -45,6 +46,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Pause the view's session
         sceneView.session.pause()
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        let node = SCNNode()
+        if let imageAnchor = anchor as? ARImageAnchor {
+            let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
+            plane.firstMaterial?.diffuse.contents = UIImage(named: "ProsekovKemSU")
+//                UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8)
+            let planeNode = SCNNode(geometry: plane)
+            planeNode.eulerAngles.x = -.pi / 2
+            node.addChildNode(planeNode)
+        }
+        return node
     }
 
     // MARK: - ARSCNViewDelegate
