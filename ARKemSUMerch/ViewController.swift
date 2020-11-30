@@ -9,81 +9,90 @@
 import UIKit
 import SceneKit
 import ARKit
+import AVFoundation
 
 class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
+    var currentAnchor: ARImageAnchor?
+    var currentPlayer: AVPlayer?
+    var currentNode: SCNNode?
+    var currentPlane: SCNPlane?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Set the view's delegate
         sceneView.delegate = self
-        
-        // Show statistics such as fps and timing information
-        sceneView.showsStatistics = true
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Create a session configuration
         let configuration = ARImageTrackingConfiguration()
         if let imageToTrack = ARReferenceImage.referenceImages(inGroupNamed: "KemSU AR Resources", bundle: .main) {
             configuration.trackingImages = imageToTrack
             configuration.maximumNumberOfTrackedImages = 1
-            print("Image successfully added!")
         }
         
-
-        // Run the view's session
         sceneView.session.run(configuration)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        // Pause the view's session
         sceneView.session.pause()
     }
     
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
+        
+        currentPlayer?.pause()
+        
+        currentNode = SCNNode()
+        
         if let imageAnchor = anchor as? ARImageAnchor {
-            let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
-            plane.firstMaterial?.diffuse.contents = UIImage(named: "ProsekovKemSU")
-//                UIColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8)
-            let planeNode = SCNNode(geometry: plane)
-            planeNode.eulerAngles.x = -.pi / 2
-            node.addChildNode(planeNode)
-        }
-        return node
-    }
+            currentPlane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
+            
+            var urlString: String = ""
+            if let imageAnchorName = imageAnchor.name {
+                
+                switch imageAnchorName {
+                case "LogoKemSU":
+                    urlString = ""
+                case "LogoIFS":
+                    urlString = ""
+                case "LabImage":
+                    urlString = "https://mydoc.kemsu.ru/IFS2.mp4"
+                case "StudentsImage":
+                    urlString = "https://mydoc.kemsu.ru/IFS3.mp4"
+                case "VRImage":
+                    urlString = "https://mydoc.kemsu.ru/IFS1.mp4"
+                default:
+                    urlString = ""
+                }
+            }
+            
+            guard let url = URL(string: urlString) else {
+                print("url doesn't exist")
+                return currentNode
+            }
+            print("url does exist!!")
+            currentPlayer = AVPlayer(url: url)
 
-    // MARK: - ARSCNViewDelegate
-    
-/*
-    // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
-     
-        return node
-    }
-*/
-    
-    func session(_ session: ARSession, didFailWithError error: Error) {
-        // Present an error message to the user
-        
-    }
-    
-    func sessionWasInterrupted(_ session: ARSession) {
-        // Inform the user that the session has been interrupted, for example, by presenting an overlay
-        
-    }
-    
-    func sessionInterruptionEnded(_ session: ARSession) {
-        // Reset tracking and/or remove existing anchors if consistent tracking is required
-        
+            currentPlayer?.play()
+            
+//            let videoNode = SKVideoNode(url: url)
+//            videoNode.play()
+//
+//            let videoScene = SKScene(size: CGSize(width: 480, height: 360))
+//            videoScene.addChild(videoNode)
+            
+            currentPlane?.firstMaterial?.diffuse.contents = currentPlayer
+            
+            let planeNode = SCNNode(geometry: currentPlane)
+            planeNode.eulerAngles.x = -.pi / 2
+            currentNode?.addChildNode(planeNode)
+        }
+        return currentNode
     }
 }

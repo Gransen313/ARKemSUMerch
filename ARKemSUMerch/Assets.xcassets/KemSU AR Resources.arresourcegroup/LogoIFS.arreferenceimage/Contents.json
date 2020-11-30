@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "LogoKemSU.jpg",
+      "filename" : "LogoIFS.png",
       "idiom" : "universal"
     }
   ],
@@ -10,6 +10,6 @@
     "version" : 1
   },
   "properties" : {
-    "width" : 0.21199999999999999
+    "width" : 0.027
   }
 }

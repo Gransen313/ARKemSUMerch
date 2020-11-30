@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B324A36256CFE38007F2C18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D8E8025133F31007F171D /* Assets.xcassets */; };
 		9B4D8E7825133F2A007F171D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4D8E7725133F2A007F171D /* AppDelegate.swift */; };
 		9B4D8E7A25133F2A007F171D /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D8E7925133F2A007F171D /* art.scnassets */; };
 		9B4D8E7C25133F2A007F171D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4D8E7B25133F2A007F171D /* ViewController.swift */; };
 		9B4D8E7F25133F2A007F171D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D8E7D25133F2A007F171D /* Main.storyboard */; };
-		9B4D8E8125133F31007F171D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D8E8025133F31007F171D /* Assets.xcassets */; };
 		9B4D8E8425133F31007F171D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D8E8225133F31007F171D /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -127,7 +127,7 @@
 			files = (
 				9B4D8E7A25133F2A007F171D /* art.scnassets in Resources */,
 				9B4D8E8425133F31007F171D /* LaunchScreen.storyboard in Resources */,
-				9B4D8E8125133F31007F171D /* Assets.xcassets in Resources */,
+				9B324A36256CFE38007F2C18 /* Assets.xcassets in Resources */,
 				9B4D8E7F25133F2A007F171D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

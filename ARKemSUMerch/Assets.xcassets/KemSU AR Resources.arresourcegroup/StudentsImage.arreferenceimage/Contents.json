@@ -1,12 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "ProsekovKemSU.jpg",
+      "filename" : "StudentsImage.png",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "width" : 0.098000000000000004
   }
 }
