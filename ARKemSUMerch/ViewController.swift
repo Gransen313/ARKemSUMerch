@@ -21,8 +21,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var currentPlane: SCNPlane?
     
 //    var scnNodeCrew: SCNNode?
-//    var currentARImageAnchorIdentifier: UUID?
-//    var timer: Timer!
+    var currentARImageAnchorIdentifier: UUID?
+    var timer: Timer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +40,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         sceneView.session.run(configuration)
+        sceneView.automaticallyUpdatesLighting = true
+        initialize()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -48,9 +50,45 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.pause()
     }
     
+    func initialize() {
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(checkAnchor), userInfo: nil, repeats: true)
+    }
+    
+    @objc func checkAnchor() {
+        let pointOfView = sceneView.pointOfView
+        if let currentNodeExisted = currentNode, let pointOfViewExisted = pointOfView {
+            if sceneView.isNode(currentNodeExisted, insideFrustumOf: pointOfViewExisted) {
+                print("node is visible")
+            } else {
+                print("node isn't visible")
+                imageLost()
+            }
+        }
+    }
+    
+//    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+//        let pointOfView = sceneView.pointOfView
+//        if let currentNodeExisted = currentNode, let pointOfViewExisted = pointOfView {
+//            if sceneView.isNode(currentNodeExisted, insideFrustumOf: pointOfViewExisted) {
+//                print("node is visible")
+//            } else {
+//                print("node isn't visible")
+//            }
+//        }
+//    }
+    
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        //
+//        DispatchQueue.main.async {
+//            if self.timer != nil {
+//                self.timer.invalidate()
+//            }
+//            self.timer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(self.imageLost(_: anchor)), userInfo: nil, repeats: false)
+//        }
         
+        //
 //        currentPlayer?.pause()
+        
         if currentPlayer != nil {
             currentPlayer = nil
             sceneView.session.remove(anchor: currentAnchor!)
@@ -60,6 +98,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         currentNode = SCNNode()
         
         if let imageAnchor = anchor as? ARImageAnchor {
+            
+            //
+            self.currentARImageAnchorIdentifier = imageAnchor.identifier
+            
             currentPlane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
             
             //
@@ -69,10 +111,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             if let imageAnchorName = imageAnchor.name {
                 
                 switch imageAnchorName {
-                case "LogoKemSU":
-                    urlString = ""
                 case "LogoIFS":
-                    urlString = ""
+                    if let ifsScene = SCNScene(named: "art.scnassets/ifs.scn") {
+                        
+                        if let ifsNode = ifsScene.rootNode.childNodes.first {
+                            ifsNode.eulerAngles.x = .pi / 2
+                            let planeNode = SCNNode(geometry: currentPlane)
+                            planeNode.eulerAngles.x = -.pi / 2
+                            planeNode.addChildNode(ifsNode)
+                            currentNode?.addChildNode(planeNode)
+                            return currentNode
+                        }
+                    }
+                    
                 case "LabImage":
                     urlString = "https://mydoc.kemsu.ru/IFS2.mp4"
                 case "StudentsImage":
@@ -106,6 +157,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             currentNode?.addChildNode(planeNode)
         }
         
+        
         return currentNode
+    }
+    
+    @objc func imageLost() {
+        if currentPlayer != nil {
+            currentPlayer = nil
+            sceneView.session.remove(anchor: currentAnchor!)
+            currentPlane?.firstMaterial?.diffuse.contents = UIColor.clear
+        }
     }
 }
