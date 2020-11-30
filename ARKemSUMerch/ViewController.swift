@@ -12,13 +12,17 @@ import ARKit
 import AVFoundation
 
 class ViewController: UIViewController, ARSCNViewDelegate {
-
+    
     @IBOutlet var sceneView: ARSCNView!
     
     var currentAnchor: ARImageAnchor?
     var currentPlayer: AVPlayer?
-    var currentNode: SCNNode?
+    var currentNode: SCNNode? = nil
     var currentPlane: SCNPlane?
+    
+//    var scnNodeCrew: SCNNode?
+//    var currentARImageAnchorIdentifier: UUID?
+//    var timer: Timer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,12 +50,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         
-        currentPlayer?.pause()
+//        currentPlayer?.pause()
+        if currentPlayer != nil {
+            currentPlayer = nil
+            sceneView.session.remove(anchor: currentAnchor!)
+            currentPlane?.firstMaterial?.diffuse.contents = UIColor.clear
+        }
         
         currentNode = SCNNode()
         
         if let imageAnchor = anchor as? ARImageAnchor {
             currentPlane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
+            
+            //
+            self.currentAnchor = imageAnchor
             
             var urlString: String = ""
             if let imageAnchorName = imageAnchor.name {
@@ -78,7 +90,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             }
             print("url does exist!!")
             currentPlayer = AVPlayer(url: url)
-
+            
             currentPlayer?.play()
             
 //            let videoNode = SKVideoNode(url: url)
@@ -93,6 +105,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             planeNode.eulerAngles.x = -.pi / 2
             currentNode?.addChildNode(planeNode)
         }
+        
         return currentNode
     }
 }
